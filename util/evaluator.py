@@ -22,10 +22,10 @@ class Evaluator():
         self.result = self.network.predict(
             input_data=self.testset.data)
 
+
         for i in range(self.total_count):
-            if Evaluator.__get_max_index(
-                self.testset.target[i]) == Evaluator.__get_max_index(
-                self.result[i]):
+
+            if np.argmax(self.testset.target[i]) == np.argmax(self.result[i]):
                 self.correct_count += 1
         
         self.accuracy = float(self.correct_count)/self.total_count
@@ -39,16 +39,3 @@ class Evaluator():
 
         ploter.plot_array(self.result)
         
-
-    @staticmethod
-    def __get_max_index(array):
-        max_ele = array[0]
-        max_index = 0
-        current_index = 0
-        for a in array:
-            if a > max_ele:
-                max_ele = a
-                max_index = current_index
-
-            current_index += 1 
-        return max_index

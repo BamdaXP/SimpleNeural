@@ -7,7 +7,7 @@ class Settings():
     # The text categories to fetch and classify
     CATEGORIES = ['alt.atheism', 'talk.religion.misc',
                   'comp.graphics', 'sci.space']
-    MAX_FEATURES = 200  # Max features to vectorize
+    MAX_FEATURES = 3000  # Max features to vectorize
 
     '''
     Settings for ploter   

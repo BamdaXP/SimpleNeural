@@ -17,23 +17,22 @@ if __name__ == "__main__":
     sin_test = Sineset(type="test")
 
 
-    node_count = 100
-
     network = nt.Network(train_set)
 
     # Input layer
-    network.append_linear_layer(
-        network.dataset.data.shape[1], node_count)
-
+    network.append_linear_layer(64)
+    network.append_linear_layer(32)
+    network.append_linear_layer(16)
+    network.append_linear_layer(4)
+    network.append_activation_layer(type="Softmax")
     # Hiden layer
-    network.append_activation_layer(type="Sigmoid")
-    network.append_linear_layer(node_count, 4)
-
+    network.train()
+    print(network.layer_results)
     # network.show_structure()
-    network.train_repeatly(1000)
+    network.train_repeatly(times=1000,print_cost=True)
 
 
-    print(network.final_result)
+    #print(network.final_result)
     ploter.plot_cost(network)
 
     self_evaluator = Evaluator(network,network.dataset)

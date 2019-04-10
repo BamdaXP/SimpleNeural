@@ -68,11 +68,13 @@ class Dataset():
             [0,1,0,0],
             [0,0,0,1],
         ]
+        
         '''
         t = np.zeros(shape=self.__target.shape+(len(settings.CATEGORIES),))
         for i in range(self.__target.shape[0]):
-            t[i,self.__target[i]] = 1
+            t[i, self.__target[i]] = 1
         return t
+        #return self.__target.reshape(self.__target.shape[0],1)
 
 
 

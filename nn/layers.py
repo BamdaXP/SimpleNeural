@@ -2,8 +2,11 @@ import numpy as np
 import math
 from settings import settings
 class Layer:
-    def __init__(self):
-        pass
+
+    node_count = 0
+
+    def __init__(self,node_count=0):
+        self.node_count = node_count
 
 
     #Retrun layer output
@@ -66,12 +69,43 @@ class TanhLayer(Layer):
         return layer_delta_output*grad_tanh
 
 
+class SoftmaxLayer():
+    def __init__(self):
+        pass
+
+    def __softmax(self, matrix_input):
+        # Matrix
+        def exp_minmax(matrix_input): return np.exp(
+            matrix_input - np.max(matrix_input))
+
+        def denom(x): return 1.0 / np.sum(x)
+        matrix_input = np.apply_along_axis(exp_minmax, 1, matrix_input)
+        denominator = np.apply_along_axis(denom, 1, matrix_input)
+
+        if len(denominator.shape) == 1:
+            denominator = denominator.reshape((denominator.shape[0], 1))
+
+        return matrix_input * denominator
+
+    def forward(self, layer_input):
+        return self.__softmax(layer_input)
+
+    def backward(self, layer_input, layer_delta_output, iter_count):
+        '''layer_output = self.forward(layer_input)
+        
+        def denom(x): return x-np.sum(x)
+        
+        return layer_delta_output * np.apply_along_axis(denom,1,layer_output)'''
+
+        return layer_delta_output
+
+
 class LinearLayer(Layer):
 
     def __init__(self, input_num, output_num, 
                 learning_rate=settings.DEFAULT_LEARNING_RATE, regularization_coefficient=settings.DEFAULT_REGULARIZATION_COEFFICIENT, 
                 learning_rate_update_mode="static", learning_rate_update_param=tuple()):
-
+        self.node_count = output_num
         
         self.learning_rate = learning_rate
         self.learning_rate_update_mode = learning_rate_update_mode
@@ -125,3 +159,5 @@ class LinearLayer(Layer):
            self.learning_rate = self.learning_rate * (1.0/(1.0 + math.exp(-self.learning_rate_param[0] * (iter_count - self.learning_rate_param[1]))))
         else:
             pass
+
+
