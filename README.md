@@ -1,7 +1,7 @@
-# Simple Neural Nextwork
+# Simple Neural Network
 A basic framework to construct a neural network system.
 
-In example,I used it to classify texts.(It is not well constructed)
+In this example,I used it to classify texts.(It is not well constructed)
 
 ## Dependencies
 * Numpy
