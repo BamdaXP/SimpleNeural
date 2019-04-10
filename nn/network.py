@@ -44,11 +44,11 @@ class Network():
         #Using original data as the first input,then each next layer uses the result of last layer
         layer_input_set = [self.dataset.data]+layer_results
 
-        final_result = layer_results[-1]
+        self.final_result = layer_results[-1]
 
         # Using default sum(y-y_hat)**2 as the cost function
-        cost_function = np.square(final_result - self.dataset.target).sum()
-        delta_cost = 2.0*(final_result-self.dataset.target)
+        cost_function = np.square(self.final_result - self.dataset.target).sum()
+        delta_cost = 2.0*(self.final_result-self.dataset.target)
 
         #Back propagation :stepping backward
         for l in range(len(self.structure))[::-1]:

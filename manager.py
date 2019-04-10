@@ -8,39 +8,36 @@ if __name__ == "__main__":
 
     train_set = Dataset()
     test_set = Dataset(type="test")
+    
+
+    print(train_set.target)
+    print(train_set.data.shape)
 
     sin_set = Sineset()
     sin_test = Sineset(type="test")
 
-    node_cost = list()
-    node_count = 100
-    costs = []
 
-    network = nt.Network(sin_set)
+    node_count = 100
+
+    network = nt.Network(train_set)
+
     # Input layer
     network.append_linear_layer(
         network.dataset.data.shape[1], node_count)
 
     # Hiden layer
     network.append_activation_layer(type="Sigmoid")
-    #network.append_linear_layer(node_count, node_count)
-    #network.append_activation_layer(type="ReLU")
-    #network.append_linear_layer(node_count, node_count)
-    #network.append_activation_layer(type="ReLU")
-    network.append_linear_layer(node_count, 1)
-    # Output layer
+    network.append_linear_layer(node_count, 4)
 
     # network.show_structure()
-    network.train_repeatly(2000)
-    costs.append(network.cost_recorder[-1])
+    network.train_repeatly(1000)
 
-    # node_cost.append(network.cost_recorder[-1])
-    # ploter.plot_array(node_cost)
 
-    #ploter.plot_array(costs)
+    print(network.final_result)
+    ploter.plot_cost(network)
 
     self_evaluator = Evaluator(network,network.dataset)
-    evaluator = Evaluator(network,sin_test)
-    self_evaluator.reg_evaluate()
-    evaluator.reg_evaluate()
+    evaluator = Evaluator(network,test_set)
+    self_evaluator.clf_evaluate()
+    evaluator.clf_evaluate()
 
