@@ -1,3 +1,4 @@
+from settings import settings
 import nn.layers as layers
 import numpy as np
 
@@ -20,8 +21,8 @@ class Network():
     def append_activation_layer(self,type="Sigmoid"):
         self.structure.append(Network.layer_types()[type]())
 
-    def append_linear_layer(self,i_num,o_num):
-        self.structure.append(layers.LinearLayer(i_num,o_num))
+    def append_linear_layer(self,i_num,o_num,learning_rate=settings.DEFAULT_LEARNING_RATE,regularization_coefficient=settings.DEFAULT_REGULARIZATION_COEFFICIENT,learning_rate_update_mode="static",learning_rate_update_param=tuple()):
+        self.structure.append(layers.LinearLayer(i_num,o_num,learning_rate,regularization_coefficient,learning_rate_update_mode,learning_rate_update_param))
 
     def forward_propagation(self,input_data=None):
         layer_results = []
@@ -37,7 +38,7 @@ class Network():
 
         return layer_results
     
-    def train(self):
+    def train(self,iter_count=1):
         #Storing all the result of each layer
         layer_results = self.forward_propagation()
         #Using original data as the first input,then each next layer uses the result of last layer
@@ -52,7 +53,7 @@ class Network():
         #Back propagation :stepping backward
         for l in range(len(self.structure))[::-1]:
             layer = self.structure[l]
-            delta_cost = layer.backward(layer_input_set[l], delta_cost)
+            delta_cost = layer.backward(layer_input_set[l], delta_cost,iter_count=iter_count)
 
         return np.mean(cost_function)
 
@@ -61,7 +62,7 @@ class Network():
             self.cost_recorder.clear()
 
         for i in range(times):
-            cost = self.train()
+            cost = self.train(i)
             self.cost_recorder.append(cost)
             if print_cost and i%print_interval == 0:
                 print("Current cost:%s"%(cost))

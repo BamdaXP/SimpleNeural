@@ -20,8 +20,9 @@ class Settings():
     Settings for neural network  
     '''
     DEFAULT_LEARNING_RATE = 0.01
-    DEFAULT_REGULARIZATION_COEFFICIENT = 0.1
-
+    DEFAULT_REGULARIZATION_COEFFICIENT = 0.01
+    DEFAULT_LEARNING_RATE_GAMMA = 1.0
+    DEFAULT_LEARNING_RATE_STEP = 100
 
 
 settings = Settings()
