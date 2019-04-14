@@ -17,12 +17,18 @@ if __name__ == "__main__":
     sin_test = Sineset(type="test")
 
 
-    network = nt.Network(sin_set)
+    network = nt.Network(train_set,cost_type="CEH")
 
     # Hiden layer
     network.append_linear_layer(64)
-    network.append_activation_layer(type="Tanh")
-    network.append_linear_layer(1)
+    network.append_activation_layer(type="ReLU")
+    network.append_linear_layer(32)
+    network.append_activation_layer(type="ReLU")
+    network.append_linear_layer(16)
+    network.append_activation_layer(type="ReLU")
+    network.append_linear_layer(8)
+    network.append_activation_layer(type="ReLU")
+    network.append_linear_layer(4)
 
     # network.show_structure()
     network.train_repeatly(times=1000,print_cost=True)
@@ -32,7 +38,9 @@ if __name__ == "__main__":
     ploter.plot_cost(network)
 
     self_evaluator = Evaluator(network,network.dataset)
-    evaluator = Evaluator(network,sin_test)
-    self_evaluator.reg_evaluate()
-    evaluator.reg_evaluate()
+    evaluator = Evaluator(network,test_set)
+    self_evaluator.clf_evaluate()
+    evaluator.clf_evaluate()
+    print(train_set.target)
+    print(self_evaluator.result)
 

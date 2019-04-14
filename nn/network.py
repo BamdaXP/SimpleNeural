@@ -4,24 +4,23 @@ import numpy as np
 
 class Network():
 
-    @staticmethod
-    def layer_types():
-        return {
-            None:layers.Layer,
-            "Sigmoid":layers.SigmoidLayer,
-            "ReLU":layers.ReLULayer,
-            "Tanh":layers.TanhLayer,
-            "Softmax":layers.SoftmaxLayer
-        }
+    
 
-    def __init__(self,dataset):
+    def __init__(self,dataset,cost_type="MSE"):
+        '''
+        cost type:
+        - MSE
+        - CEH
+        '''
         self.dataset = dataset#Matrix
         self.structure = list()
         self.cost_recorder = list()
         self.structure.append(layers.Layer(self.dataset.data.shape[1]))
+        self.cost_type = cost_type
+
 
     def append_activation_layer(self,type="Sigmoid"):
-        layer = Network.layer_types()[type]()
+        layer = layers.Layer.layer_types()[type]()
         layer.node_count = self.structure[-1].node_count
         self.structure.append(layer)
         
@@ -50,29 +49,45 @@ class Network():
 
         return layer_results
     
+
+    
+    def cost_function(self):
+        if self.cost_type == "CEH":       
+            # Matrix
+            shifted_exp_result = np.clip(np.exp(self.final_result - np.amax(self.final_result,axis=1,keepdims=True)),0.0,1e10)#number safety
+            softmax_result = np.clip(shifted_exp_result/shifted_exp_result.sum(axis=1,keepdims=True),1e-10,1.0)
+            return -self.dataset.target*np.log(softmax_result)
+        else:
+            return np.square(
+                self.final_result - self.dataset.target)#.sum()/self.dataset.data.shape[0]
+
+    def delta_cost(self):
+        if self.cost_type == "CEH":
+            #par_L/par_c = y - y_hat
+            return self.final_result - self.dataset.target
+        else:
+            #par_L/par_c = 2*(y - y_hat)
+            return 2.0*(self.final_result-self.dataset.target)
+
+
+    
     def train(self,iter_count=1):
         #Storing all the result of each layer
-        self.layer_results = self.forward_propagation()
+        layer_results = self.forward_propagation()
         #Using original data as the first input,then each next layer uses the result of last layer
-        layer_input_set = [self.dataset.data]+self.layer_results
+        layer_input_set = [self.dataset.data]+layer_results
 
-        self.final_result = self.layer_results[-1]
+        self.final_result = layer_results[-1]
 
-        # Using default sum(y-y_hat)**2 as the cost function
-        cost_function = np.square(
-            self.final_result - self.dataset.target).sum()/self.dataset.data.shape[0]
-        delta_cost = 2.0*(self.final_result-self.dataset.target)
-
-
-        #self.final_result = np.maximum(self.final_result,1e-10)
-        #cost_function = -(self.dataset.target*np.log(self.final_result))+(1-self.dataset.target*np.log(1-self.final_result)).sum()/self.dataset.data.shape[0]
-        #delta_cost = -self.dataset.target/self.final_result/self.dataset.data.shape[0]
+        cost_function = self.cost_function()
+        delta_cost = self.delta_cost()
 
         #Back propagation :stepping backward
         for l in range(len(self.structure))[::-1]:
             layer = self.structure[l]
-            delta_cost = layer.backward(layer_input_set[l], delta_cost,iter_count=iter_count)
+            layer.backward(layer_input_set[l], delta_cost,iter_count=iter_count)
 
+        #Return cost
         return np.mean(cost_function)
 
     def train_repeatly(self, times, print_cost = False , print_interval=100, clear_record=True):

@@ -3,6 +3,15 @@ import math
 from settings import settings
 class Layer:
 
+    @staticmethod
+    def layer_types():
+        return {
+            None: Layer,
+            "Sigmoid": SigmoidLayer,
+            "ReLU": ReLULayer,
+            "Tanh": TanhLayer,
+        }
+
     node_count = 0
 
     def __init__(self,node_count=0):
@@ -68,36 +77,6 @@ class TanhLayer(Layer):
         grad_tanh = 1-(self.__tanh(layer_input))**2
         return layer_delta_output*grad_tanh
 
-
-class SoftmaxLayer():
-    def __init__(self):
-        pass
-
-    def __softmax(self, matrix_input):
-        # Matrix
-        def exp_minmax(matrix_input): return np.exp(
-            matrix_input - np.max(matrix_input))
-
-        def denom(x): return 1.0 / np.sum(x)
-        matrix_input = np.apply_along_axis(exp_minmax, 1, matrix_input)
-        denominator = np.apply_along_axis(denom, 1, matrix_input)
-
-        if len(denominator.shape) == 1:
-            denominator = denominator.reshape((denominator.shape[0], 1))
-
-        return matrix_input * denominator
-
-    def forward(self, layer_input):
-        return self.__softmax(layer_input)
-
-    def backward(self, layer_input, layer_delta_output, iter_count):
-        '''layer_output = self.forward(layer_input)
-        
-        def denom(x): return x-np.sum(x)
-        
-        return layer_delta_output * np.apply_along_axis(denom,1,layer_output)'''
-
-        return layer_delta_output
 
 
 class LinearLayer(Layer):
