@@ -6,10 +6,10 @@ class Layer:
     @staticmethod
     def layer_types():
         return {
-            None: Layer,
-            "Sigmoid": SigmoidLayer,
-            "ReLU": ReLULayer,
-            "Tanh": TanhLayer,
+            None:Layer,
+            "Sigmoid":SigmoidLayer,
+            "ReLU":ReLULayer,
+            "Tanh":TanhLayer,
         }
 
     node_count = 0
@@ -43,7 +43,7 @@ class ReLULayer(Layer):
         return np.maximum(0, layer_input)
 
     def backward(self, layer_input, layer_delta_output, iter_count):
-        relu_grad = layer_input > 0
+        relu_grad = np.array(layer_input>0,dtype=np.float)
         return layer_delta_output*relu_grad
 
 class SigmoidLayer(Layer):
@@ -77,8 +77,6 @@ class TanhLayer(Layer):
         grad_tanh = 1-(self.__tanh(layer_input))**2
         return layer_delta_output*grad_tanh
 
-
-
 class LinearLayer(Layer):
 
     def __init__(self, input_num, output_num, 
@@ -91,28 +89,65 @@ class LinearLayer(Layer):
         self.learning_rate_param = learning_rate_update_param
 
         self.regularization_coefficient = regularization_coefficient
-        self.weights = np.random.randn(input_num,output_num)#np.zeros(shape=(input_num,output_num))#
-        self.biases = np.random.randn(output_num)*learning_rate#np.zeros(shape=(output_num,))#
+
+        #+1 for the Bias
+        self.weights = np.random.randn(input_num+1,output_num)#np.zeros(shape=(input_num,output_num))#
+        # np.zeros(shape=(output_num,))#
+        #self.biases = np.random.randn(input_num,output_num)*learning_rate
 
   
     def forward(self, layer_input):
-        return np.dot(layer_input, self.weights)+self.biases
+        '''
+        [
+            [1,2,3],
+            [4,5,6],  
+            [7,8,9]
+        ]
+        =>
+        [
+            [1,2,3,1],
+            [4,5,6,1],  
+            [7,8,9,1]
+        ]
+        '''
+        #append 1 column of 1 for bias
+        ones = np.ones(shape=(layer_input.shape[0],1))
+        layer_input = np.c_[layer_input,ones]
+        return np.dot(layer_input, self.weights)
 
     def backward(self, layer_input, layer_delta_output,iter_count):
+        '''
+        [
+            [1,2,3,1],
+            [4,5,6,1],
+            [7,8,9,1]
+        ]
+        =>
+        [
+            [1,2,3],
+            [4,5,6],
+            [7,8,9]
+        ]
+        '''
+        ones = np.ones(shape=(layer_input.shape[0], 1))
+        layer_input = np.c_[layer_input, ones]
+
         delta_input = np.dot(layer_delta_output, self.weights.T)
         #delta_W = par_l/par_W = sum(X*delta_Y)/m
         delta_weights = np.dot(
             layer_input.T, layer_delta_output)/layer_input.shape[0]
         #Calculate average of each column
         #delta_b= par_L/par_b = sum(delta_Y)/m   (X=1)
-        delta_biases = layer_delta_output.mean(axis=0)
+        #delta_biases = layer_delta_output.mean(axis=0)
         self.weights = self.weights*(1.0-self.learning_rate*self.regularization_coefficient /#Regularization
                                     layer_input.shape[0]) - self.learning_rate*delta_weights
-        self.biases = self.biases - self.learning_rate*delta_biases
         
         self.update_learning_rate(iter_count)
 
-        return delta_input
+        return np.delete(delta_input, -1, axis=1)#delete appended column 1
+
+    def dropout_input(self):
+        pass
 
     def update_learning_rate(self,iter_count):
         if self.learning_rate_update_mode == "static":
