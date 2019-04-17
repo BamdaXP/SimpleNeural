@@ -3,6 +3,8 @@ import numpy as np
 from pprint import pprint
 from sklearn.datasets import fetch_20newsgroups
 from sklearn.feature_extraction.text import TfidfVectorizer
+import mnist
+
 
 class Dataset():
     '''
@@ -92,3 +94,27 @@ class Sineset():
             self.data = np.linspace(-np.pi, 0.7 * np.pi, 140).reshape(140,1)
         
         self.target = np.sin(self.data)
+
+
+class Mnistset():
+    def __init__(self,type="train"):
+        if type == "test":
+            images = mnist.test_images()
+            labels = mnist.test_labels()
+        else:
+            images = mnist.train_images()
+            labels = mnist.train_labels()
+        
+        n_test, w, h = images.shape
+        self.__data = images.reshape((n_test, w*h))
+        self.__target = labels
+    
+    @property
+    def target(self):
+        t = np.zeros(shape=self.__target.shape+(len(settings.CATEGORIES),))
+        for i in range(self.__target.shape[0]):
+            t[i, self.__target[i]] = 1
+        return t
+    @property
+    def data(self):
+        return self.data
