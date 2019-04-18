@@ -4,7 +4,7 @@ import numpy as np
 
 class Network():
 
-    def __init__(self,dataset,cost_type="MSE"):
+    def __init__(self,dataset,cost_type="MSE",allowed_sample=2000):
         self.dataset = dataset#Matrix
         self.structure = list()
         self.cost_recorder = list()

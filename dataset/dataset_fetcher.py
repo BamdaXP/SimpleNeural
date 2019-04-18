@@ -1,12 +1,15 @@
+
 from settings import settings
 import numpy as np
 from pprint import pprint
 from sklearn.datasets import fetch_20newsgroups
 from sklearn.feature_extraction.text import TfidfVectorizer
-import mnist
+import dataset.mnist as mnist
+
+#import mnist
 
 
-class Dataset():
+class Textset():
     '''
     A wrapper for training dataset fetched by sklearn.
 
@@ -111,10 +114,10 @@ class Mnistset():
     
     @property
     def target(self):
-        t = np.zeros(shape=self.__target.shape+(len(settings.CATEGORIES),))
+        t = np.zeros(shape=self.__target.shape+(10,))
         for i in range(self.__target.shape[0]):
             t[i, self.__target[i]] = 1
         return t
     @property
     def data(self):
-        return self.data
+        return self.__data
