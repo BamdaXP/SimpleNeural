@@ -15,12 +15,20 @@ def text_clf():
     network = nt.Network(train_set,cost_type="MSE")
 
     # Hiden layer
-    network.append_linear_layer(97)
-    network.append_activation_layer(type="Tanh")
-    network.append_linear_layer(1)
+    #network.append_linear_layer(64)
+    #network.append_activation_layer(type="ReLU")
+    #network.append_linear_layer(32)
+    #network.append_activation_layer(type="ReLU")
+    network.append_linear_layer(16)
+    network.append_activation_layer(type="ReLU")
+    network.append_linear_layer(8)
+    network.append_activation_layer(type="ReLU")
+    network.append_linear_layer(4)
 
     # network.show_structure()
-    network.train_repeatly(times=1000,print_cost=True)
+    network.train_repeatly(times=10000  ,print_cost=True)
+
+
 
     print(network.final_result)
     print(train_set.target)
@@ -29,8 +37,8 @@ def text_clf():
 
     self_evaluator = Evaluator(network,network.dataset)
     evaluator = Evaluator(network,test_set)
-    self_evaluator.reg_evaluate()
-    evaluator.reg_evaluate()
+    self_evaluator.clf_evaluate()
+    evaluator.clf_evaluate()
 
 
 def sin_reg():
@@ -73,4 +81,4 @@ def mnist_clf():
     
 
 if __name__ == "__main__":
-    mnist_clf()
+    text_clf()

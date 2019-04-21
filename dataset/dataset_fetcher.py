@@ -2,6 +2,8 @@
 from settings import settings
 import numpy as np
 from pprint import pprint
+
+
 from sklearn.datasets import fetch_20newsgroups
 from sklearn.feature_extraction.text import TfidfVectorizer
 import dataset.mnist as mnist

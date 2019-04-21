@@ -43,11 +43,10 @@ class Network():
     
     def __cost_function(self):
         if self.cost_type == "CEH":#Cross Entrophy
-            exp_results = np.clip(np.exp(self.final_result),1e-10,1e10)
-            probability = exp_results / \
-                np.sum(exp_results, axis=1, keepdims=True)
+            exp_results = np.exp(self.final_result)
+            probability = exp_results / np.sum(exp_results, axis=1, keepdims=True)
             # Calculating the loss
-            return -np.log(np.clip(probability,1e-10,1))
+            return -np.log(probability)
         else:#Default uses MSE
             return np.square(self.final_result - self.dataset.target)
 
@@ -59,11 +58,11 @@ class Network():
 
     def train(self,iter_count=1):
         #Storing all the result of each layer
-        self.layer_results = self.forward_propagation()
+        layer_results = self.forward_propagation()
         #Using original data as the first input,then each next layer uses the result of last layer
-        layer_input_set = [self.dataset.data]+self.layer_results
+        layer_input_set = [self.dataset.data]+layer_results
 
-        self.final_result = self.layer_results[-1]
+        self.final_result = layer_results[-1]
 
         # Using default sum(y-y_hat)**2 as the cost function
         cost_function = self.__cost_function()

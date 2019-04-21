@@ -1,7 +1,7 @@
 import numpy as np
 import util.ploter as ploter 
 from nn.network import Network
-from dataset.dataset_fetcher import Dataset
+from dataset.dataset_fetcher import Textset
 class Evaluator():
 
     correct_count = 0
@@ -10,7 +10,7 @@ class Evaluator():
     def total_count(self):
         return self.testset.data.shape[0]
 
-    def __init__(self,network:Network,testset:Dataset):
+    def __init__(self,network:Network,testset:Textset):
         self.network = network
         self.testset = testset
 
