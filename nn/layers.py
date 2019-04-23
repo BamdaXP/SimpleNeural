@@ -2,21 +2,11 @@ import numpy as np
 import math
 from settings import settings
 class Layer:
-
-    @staticmethod
-    def layer_types():
-        return {
-            None:Layer,
-            "Sigmoid":SigmoidLayer,
-            "ReLU":ReLULayer,
-            "Tanh":TanhLayer,
-        }
-
     node_count = 0
 
     def __init__(self,node_count=0):
         self.node_count = node_count
-
+        
 
     #Retrun layer output
     def forward(self, layer_input):
@@ -34,48 +24,51 @@ class Layer:
     def backward(self, layer_input, layer_delta_output, iter_count):
         return layer_delta_output
 
+class ActivationLayer(Layer):
+    def __init__(self, type="Sigmoid", dropout_param=None):
+        self.type = type
+        self.dropout_param = dropout_param
 
-class ReLULayer(Layer):
-    def __init__(self):
-        pass
-
-    def forward(self, layer_input):
-        return np.maximum(layer_input, 0)
-
-    def backward(self, layer_input, layer_delta_output, iter_count):
-        relu_grad = np.array(layer_input>0,dtype=np.float)
-        return layer_delta_output*relu_grad
-
-class SigmoidLayer(Layer):
-    def __init__(self):
-        pass
-
-    def __sigmoid(self, x):
-        return 1.0/(1+np.exp(-x))
-
-    def forward(self, layer_input):
-        
-        return self.__sigmoid(layer_input)
-
-    def backward(self, layer_input, layer_delta_output, iter_count):
-        grad_sigmoid = self.__sigmoid(
-            layer_input)*(1-self.__sigmoid(layer_input))
-        return layer_delta_output*grad_sigmoid
+    def __feature_func(self,x):
+        if self.type == "Sigmoid":
+            return 1.0/(1+np.exp(-x))
+        elif self.type == "Tanh":
+            return np.tanh(x)
+        elif self.type == "ReLU":
+            return np.maximum(x, 0)
+        else:
+             return x
 
 
-class TanhLayer(Layer):
-    def __init__(self):
-        pass
+    def forward(self,layer_input):
+        result = self.__feature_func(layer_input)
 
-    def __tanh(self, x):
-        return np.tanh(x)
+        #Dropout
+        if not self.dropout_param is None:
+            level = self.dropout_param[0]
+            if level < 0. or level >= 1:
+                raise Exception('Dropout level must be in interval [0, 1)')
 
-    def forward(self, layer_input):
-        return self.__tanh(layer_input)
+            retain_level = 1. - level
+            sample = np.random.binomial(n=1, p=retain_level, size=result.shape)
+            result *= sample
+            result /= retain_level
+        return result
 
-    def backward(self, layer_input, layer_delta_output, iter_count):
-        grad_tanh = 1-(self.__tanh(layer_input))**2
-        return layer_delta_output*grad_tanh
+
+    def backward(self,layer_input, layer_delta_output, iter_count):
+        if self.type == "Sigmoid":
+            grad_sigmoid = self.__feature_func(
+                layer_input)*(1-self.__feature_func(layer_input))
+            return layer_delta_output*grad_sigmoid
+        elif self.type == "Tanh":
+            grad_tanh = 1-(self.__feature_func(layer_input))**2
+            return layer_delta_output*grad_tanh
+        elif self.type == "ReLU":
+            relu_grad = np.array(layer_input > 0, dtype=np.float)
+            return layer_delta_output*relu_grad
+        else:
+            return layer_delta_output
 
 class LinearLayer(Layer):
 
@@ -113,21 +106,6 @@ class LinearLayer(Layer):
         layer_delta_input = np.dot(layer_delta_output,self.weights.T)
 
         return layer_delta_input
-
-    def dropout(self,level,noise_shape=None,seed=None):
-        #check params
-        if level <0. or level >=1:
-            raise ValueError('Dropout level must be in range [0,1)')
-        if seed is None:
-            seed = np.random.randint(1,10e6)
-        if isinstance(noise_shape,list):
-            noise_shape = tuple(noise_shape)
-
-        
-
-        retain_level = 1. - level
-
-
 
 
     def update_learning_rate(self,iter_count):

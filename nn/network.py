@@ -11,8 +11,8 @@ class Network():
         self.structure.append(layers.Layer(self.dataset.data.shape[1]))
         self.cost_type = cost_type
 
-    def append_activation_layer(self,type="Sigmoid"):
-        layer = layers.Layer.layer_types()[type]()
+    def append_activation_layer(self,type="Sigmoid",dropout_param=None):
+        layer = layers.ActivationLayer(type=type,dropout_param=dropout_param)
         layer.node_count = self.structure[-1].node_count
         self.structure.append(layer)
         
@@ -64,7 +64,7 @@ class Network():
 
         self.final_result = layer_results[-1]
 
-        # Using default sum(y-y_hat)**2 as the cost function
+        #Using default sum(y-y_hat)**2 as the cost function
         cost_function = self.__cost_function()
         delta_cost = self.__delta_cost()
 
