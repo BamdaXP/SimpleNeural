@@ -110,7 +110,7 @@ def parse_idx(fd):
     return np.array(data).reshape(dimension_sizes)
 
 
-def download_and_parse_mnist_file(fname, target_dir=None, force=False):
+def download_and_parse_mnist_file(fname, target_dir=None, force=True):
     """Download the IDX file named fname from the URL specified in dataset_url
     and return it as a numpy array.
 

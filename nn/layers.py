@@ -83,7 +83,6 @@ class LinearLayer(Layer):
 
         self.regularization_coefficient = regularization_coefficient
 
-        #+1 for the Bias
         self.weights = np.random.randn(
             input_num, output_num)/np.sqrt(input_num)
         self.biases = np.zeros((1,output_num))
@@ -97,8 +96,7 @@ class LinearLayer(Layer):
         delta_weights = np.dot(
             layer_input.T, layer_delta_output)
         delta_bias = np.sum(layer_delta_output,axis=0,keepdims=True)
-        self.weights = self.weights*(1.0-self.learning_rate*self.regularization_coefficient /#Regularization
-                                    layer_input.shape[0]) - self.learning_rate*delta_weights
+        self.weights = self.weights - self.learning_rate*delta_weights
         self.biases = self.biases - self.learning_rate*delta_bias
 
         self.update_learning_rate(iter_count)

@@ -52,7 +52,7 @@ class Network():
 
     def __delta_cost(self):
         if self.cost_type == "CEH":#Cross Entrophy
-            return self.final_result - 1
+            return self.final_result - self.dataset.target
         else:  # Default uses MSE
             return 2.0*(self.final_result-self.dataset.target)
 

@@ -9,9 +9,41 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import dataset.mnist as mnist
 
 #import mnist
+class Dataset():
+    def __init__(self,data:np.ndarray,target:np.ndarray):
+        self.data = data
+        self.target = target
+
+    @staticmethod
+    def onehot(raw,types):
+        '''
+        A helper function returning a matrix with (sample_num,category_count) shape
+        For example:
+        [0,1,3...]
+        =>
+        [
+            [1,0,0,0],
+            [0,1,0,0],
+            [0,0,0,1],
+        ]
+        
+        '''
+        t = np.zeros(shape=raw.shape+(types,))
+        for i in range(raw.shape[0]):
+            t[i, raw[i]] = 1
+
+        return t
+
+    @property
+    def length(self):
+        return len(self.data)
+
+    def show(self):
+        print("Data:\n%s"%(self.data))
+        print("Target:\n%s"%(self.target))
 
 
-class Textset():
+class Textset(Dataset):
     '''
     A wrapper for training dataset fetched by sklearn.
 
@@ -42,13 +74,11 @@ class Textset():
                 subset='train',  categories=settings.CATEGORIES)
         #The vectorizer to vectorize text features
         self.__vectorizer = TfidfVectorizer(max_features=settings.MAX_FEATURES)
-
-        
-        self.__data_raw = self.__bunch.data#Raw data
+        self.data_raw = self.__bunch.data#Raw data
         # Data vectorized in to a feature matrix
-        self.__data = self.__vectorizer.fit_transform(
-            self.__data_raw).toarray()
-        self.__target = self.__bunch.target
+        d = self.__vectorizer.fit_transform(self.data_raw).toarray()
+        t = Dataset.onehot(self.__bunch.target,len(settings.CATEGORIES))
+        super().__init__(data=d,target=t)
 
 
 
@@ -58,50 +88,23 @@ class Textset():
     def bunch(self):
         return self.__bunch
     @property
-    def data_raw(self):
-        return self.__data_raw
-    @property
-    def data(self):
-        return self.__data
-    @property
-    def target(self):
-        '''
-        Returning a matrix with (sample_num,category_count) shape
-        For example:
-        [0,1,3...]
-        =>
-        [
-            [1,0,0,0],
-            [0,1,0,0],
-            [0,0,0,1],
-        ]
-        
-        '''
-        t = np.zeros(shape=self.__target.shape+(len(settings.CATEGORIES),))
-        for i in range(self.__target.shape[0]):
-            t[i, self.__target[i]] = 1
-        return t
-        #return self.__target.reshape(self.__target.shape[0],1)
+    def vectorizer(self):
+        return self.__vectorizer
 
 
 
-    def show(self):
-        pprint("Showing testing dataset:\n    Data type:%s\n    Vectorized data:%s \n    Target Vector:%s \nEnd showing testing dataset. \n\n" 
-            % (self.data.dtype, self.data,self.target))
-
-
-
-class Sineset():
+class Sineset(Dataset):
     def __init__(self,type="train"):
         if type == "test":
-            self.data = np.linspace(np.pi*0.7, np.pi, 60).reshape(60,1)
+            d = np.linspace(np.pi*0.7, np.pi, 60).reshape(60,1)
         else:
-            self.data = np.linspace(-np.pi, 0.7 * np.pi, 140).reshape(140,1)
+            d = np.linspace(-np.pi, 0.7 * np.pi, 140).reshape(140,1)
         
-        self.target = np.sin(self.data)
+        t = np.sin(self.data)
 
+        super().__init__(data=d,target=t)
 
-class Mnistset():
+class Mnistset(Dataset):
     def __init__(self,type="train"):
         if type == "test":
             images = mnist.test_images()
@@ -111,15 +114,9 @@ class Mnistset():
             labels = mnist.train_labels()
         
         n_test, w, h = images.shape
-        self.__data = images.reshape((n_test, w*h))
-        self.__target = labels
-    
-    @property
-    def target(self):
-        t = np.zeros(shape=self.__target.shape+(10,))
-        for i in range(self.__target.shape[0]):
-            t[i, self.__target[i]] = 1
-        return t
-    @property
-    def data(self):
-        return self.__data
+        d = images.reshape((n_test, w*h))
+        t = Dataset.onehot(labels,10)
+        
+        super().__init__(data=d,target=t)
+
+

@@ -50,4 +50,4 @@ self_evaluator.clf_evaluate()#classification evaluating
 
 ## To do
 * ~~Sine function is well predicted~~
-* Text classifier did not work well,accuracy remains about 30%(Considering reconstructing the network)
+* Text classifier did not work well,accuracy remains about 40%,suffering from overfitting problem.
