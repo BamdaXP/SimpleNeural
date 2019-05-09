@@ -60,29 +60,31 @@ def sin_reg():
 
 
 def mnist_clf():
-    print("OK")
-    mnist_set = Mnistset(type="train",selection_range=(0,3000))
 
-    print("OK")
+    mnist_set = Mnistset(type="train",selection_range=(0,5000))
+
+    print("Load mnist data done!")
 
     print(mnist_set.data.shape)
     print(mnist_set.target)
-
+    
+    
+    lr = 0.0001
     network = nt.Network(mnist_set,cost_type="MSE")
-    network.append_linear_layer(16,learning_rate=0.0000001)
+    network.append_linear_layer(32,learning_rate=lr)
     network.append_activation_layer(type="Sigmoid")
-    network.append_linear_layer(8,learning_rate=0.0000001)
+    network.append_linear_layer(16,learning_rate=lr)
     network.append_activation_layer(type="Sigmoid")
-    network.append_linear_layer(4,learning_rate=0.0000001)
-    network.append_activation_layer(type="Sigmoid")
-    network.append_linear_layer(10,learning_rate=0.0000001)
+    network.append_linear_layer(10,learning_rate=lr)
+    network.append_activation_layer(type="Sigmoid")	
+    network.train_repeatly(5000,print_cost=True)
 
-    network.train_repeatly(100,print_cost=True,print_interval=1)
-
-    network.dataset.selection_range = (3000,6000)
+    ploter.plot_cost(network)
+    network.dataset.selection_range = (10000,20000)
     self_evaulator = Evaluator(network,network.dataset)
     self_evaulator.clf_evaluate()
-    
+        
+
 
 if __name__ == "__main__":
     mnist_clf()
