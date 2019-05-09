@@ -10,9 +10,10 @@ import dataset.mnist as mnist
 
 #import mnist
 class Dataset():
-    def __init__(self,data:np.ndarray,target:np.ndarray):
-        self.data = data
-        self.target = target
+    def __init__(self,data:np.ndarray,target:np.ndarray,selection_range:tuple=None):
+        self._data = data
+        self._target = target
+        self.selection_range = selection_range;
 
     @staticmethod
     def onehot(raw,types):
@@ -37,11 +38,24 @@ class Dataset():
     @property
     def length(self):
         return len(self.data)
+    @property
+    def data(self):
+        if self.selection_range is None:
+            return self._data;
+        else:
+            return self._data[self.selection_range[0]:self.selection_range[1],:]
+
+    @property
+    def target(self):
+        if self.selection_range is None:
+            return self._target;
+        else:
+            return self._target[self.selection_range[0]:self.selection_range[1],:]
+
 
     def show(self):
         print("Data:\n%s"%(self.data))
         print("Target:\n%s"%(self.target))
-
 
 class Textset(Dataset):
     '''
@@ -64,7 +78,7 @@ class Textset(Dataset):
     - bunch.target_names: a list of categories of the returned data,
       length [n_classes]. This depends on the `categories` parameter.
     '''
-    def __init__(self,type="train"):
+    def __init__(self,type="train",selection_range:tuple=None):
         
         if  type == "test":
             self.__bunch = fetch_20newsgroups(
@@ -78,7 +92,7 @@ class Textset(Dataset):
         # Data vectorized in to a feature matrix
         d = self.__vectorizer.fit_transform(self.data_raw).toarray()
         t = Dataset.onehot(self.__bunch.target,len(settings.CATEGORIES))
-        super().__init__(data=d,target=t)
+        super().__init__(data=d,target=t,selection_range=selection_range)
 
 
 
@@ -94,7 +108,7 @@ class Textset(Dataset):
 
 
 class Sineset(Dataset):
-    def __init__(self,type="train"):
+    def __init__(self,type="train",selection_range:tuple=None):
         if type == "test":
             d = np.linspace(np.pi*0.7, np.pi, 60).reshape(60,1)
         else:
@@ -102,10 +116,10 @@ class Sineset(Dataset):
         
         t = np.sin(self.data)
 
-        super().__init__(data=d,target=t)
+        super().__init__(data=d,target=t,selection_range=selection_range)
 
 class Mnistset(Dataset):
-    def __init__(self,type="train"):
+    def __init__(self,type="train",selection_range:tuple=None):
         if type == "test":
             images = mnist.test_images()
             labels = mnist.test_labels()
@@ -117,6 +131,6 @@ class Mnistset(Dataset):
         d = images.reshape((n_test, w*h))
         t = Dataset.onehot(labels,10)
         
-        super().__init__(data=d,target=t)
+        super().__init__(data=d,target=t,selection_range=selection_range)
 
 

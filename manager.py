@@ -12,7 +12,7 @@ def text_clf():
     print(train_set.target)
     print(train_set.data.shape)
 
-    network = nt.Network(train_set,cost_type="CEH")
+    network = nt.Network(train_set,cost_type="MSE")
 
     # Hiden layer
     network.append_linear_layer(16)
@@ -22,7 +22,7 @@ def text_clf():
     network.append_linear_layer(4)
 
     # network.show_structure()
-    network.train_repeatly(times=2000  ,print_cost=True)
+    network.train_repeatly(times=1000  ,print_cost=True)
 
 
 
@@ -61,7 +61,7 @@ def sin_reg():
 
 def mnist_clf():
     print("OK")
-    mnist_set = Mnistset(type="train")
+    mnist_set = Mnistset(type="train",selection_range=(0,3000))
 
     print("OK")
 
@@ -69,12 +69,17 @@ def mnist_clf():
     print(mnist_set.target)
 
     network = nt.Network(mnist_set,cost_type="MSE")
-    network.append_linear_layer(128)
+    network.append_linear_layer(16,learning_rate=0.0000001)
     network.append_activation_layer(type="Sigmoid")
-    network.append_linear_layer(10)
-    
-    network.train_repeatly(1000)
+    network.append_linear_layer(8,learning_rate=0.0000001)
+    network.append_activation_layer(type="Sigmoid")
+    network.append_linear_layer(4,learning_rate=0.0000001)
+    network.append_activation_layer(type="Sigmoid")
+    network.append_linear_layer(10,learning_rate=0.0000001)
 
+    network.train_repeatly(100,print_cost=True,print_interval=1)
+
+    network.dataset.selection_range = (3000,6000)
     self_evaulator = Evaluator(network,network.dataset)
     self_evaulator.clf_evaluate()
     
